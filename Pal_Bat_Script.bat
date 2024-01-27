@@ -76,7 +76,7 @@ if !memoryInKB! gtr %memory_threshold% (
 
 
 rem 等待x分钟
-timeout /t %waittime% /nobreak
+timeout /t %WaitTime% /nobreak
 goto backuploop
 
 
