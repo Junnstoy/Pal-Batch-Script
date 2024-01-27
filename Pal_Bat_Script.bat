@@ -2,6 +2,7 @@
 title Pal-Bat-Script
 setlocal EnableDelayedExpansion
 
+rem ===========================以下路径及参数设置=============================
 rem 设置启动路径
 set StartPath="%此处填写pal服务端启动路径%"
 
@@ -24,10 +25,10 @@ set "memory_threshold=%修改为需要的内存阈值%"
 rem 设置备份间隔
 set WaitTime=%时间%
 
-
 rem ===========================以上路径及参数设置=============================
 
 :backuploop
+
 rem ===========================格式化日期=====================================
 set yyyy=%DATE:~0,4%
 set mm=%DATE:~5,2%
@@ -41,7 +42,7 @@ echo %timestamp%
 rem ===========================robocopy 进行备份==============================
 robocopy "%SourceFolder%" "%BackupFolder%\%timestamp%" /e /COPYALL /TEE /LOG+:"backup.log" /R:5 /W:5
 
-rem ===========================robocopy 进行备份==============================
+rem ===========================删除超过次数的备份文件==========================
 set "count=0"
 for /d %%D in ("%BackupFolder%\*") do set /a "count+=1"
 rem 如果备份数量超过最大备份次数，则删除最旧的备份文件夹
@@ -53,7 +54,7 @@ if !count! gtr %MaxBackupCount% (
 )
 :breakbackup
 
-
+rem ===========================内存检查及程序重启==============================
 rem 获取指定程序的内存使用情况
 for /f "tokens=5" %%a in ('tasklist /fi "imagename eq %program_name%" ^| find /i "%program_name%"') do (
     set "memory=%%a"
@@ -74,10 +75,9 @@ if !memoryInKB! gtr %memory_threshold% (
     echo Memory usage of %program_name% is within the threshold.
 )
 
-
-rem 等待x分钟
+rem ===========================备份间隔时间=====================================
+rem 等待x秒
 timeout /t %WaitTime% /nobreak
 goto backuploop
-
 
 
